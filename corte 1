@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Corte 1</title>
+
+<script>
+  function calculate() {
+    // obtiene coeficientes de formulario
+    const coefficients = [];
+    for (let i = 0; i <= 6; i++) {
+      coefficients.push(parseFloat(document.getElementById(`coef${i}`).value));
+    }
+
+    // Define funcion 
+    function polynomial(x) {
+      return coefficients.reduce((sum, coef, index) => sum + coef * Math.pow(x, index), 0);
+    }
+
+    // Metodo de biseccion para encontrar puntos de interseccion
+    function bisection(a, b, epsilon) {
+      let root;
+      while (Math.abs(b - a) > epsilon) {
+        root = (a + b) / 2;
+        if (polynomial(root) === 0) {
+          break;
+        } else if (polynomial(root) * polynomial(a) < 0) {
+          b = root;
+        } else {
+          a = root;
+        }
+      }
+      return root;
+    }
+
+    // encuentra y muestra raices
+    const roots = [];
+    const epsilon = 0.0001;
+    for (let i = 0; i < 5; i++) {
+      const a = i;
+      const b = i + 1;
+      const root = bisection(a, b, epsilon);
+      roots.push(root);
+    }
+
+    const resultTable = document.getElementById("resultTable");
+    const numRootsDisplay = document.getElementById("numRoots");
+    resultTable.innerHTML = "<tr><th>Root Index</th><th>X Value</th></tr>";
+    for (let i = 0; i < roots.length; i++) {
+      resultTable.innerHTML += `<tr><td>${i + 1}</td><td>${roots[i].toFixed(4)}</td></tr>`;
+    }
+    numRootsDisplay.textContent = roots.length;
+
+    // Monte Carlo para el Area
+    const iterations = 100000;
+    let pointsInside = 0;
+    for (let i = 0; i < iterations; i++) {
+      const x = Math.random() * (roots[roots.length - 1] - roots[0]) + roots[0];
+      const y = Math.random() * (Math.max(...coefficients) - Math.min(...coefficients)) + Math.min(...coefficients);
+      if (y <= polynomial(x)) {
+        pointsInside++;
+      }
+    }
+    const totalArea = (roots[roots.length - 1] - roots[0]) * (Math.max(...coefficients) - Math.min(...coefficients));
+    const estimatedArea = totalArea * (pointsInside / iterations);
+    document.getElementById("areaResult").textContent = estimatedArea.toFixed(4);
+  }
+</script>
+</head>
+
+<body>
+
+<h1>Aplicaiones de internet. corte 1</h1>
+<h1>Juan Pablo Arias 180083</h1>
+<img src="polinomio.png">
+<!--crea formulario-->
+<form>
+  <label for="x1">x0:</label>
+  <input type="number" step="any" id="coef0"><br>
+  
+  <label for="x1">x1:</label>
+  <input type="number" step="any" name="x1" id="coef1" required><br>
+  
+  <label for="x2">x2:</label>
+  <input type="number" step="any" name="x2" id="coef2" required><br>
+
+  <label for="x3">x3:</label>
+  <input type="number" step="any" name="x3" id="coef3" required><br>
+
+  <label for="x4">x4:</label>
+  <input type="number" step="any" name="x4" id="coef4" required><br>
+
+  <label for="x5">x5:</label>
+  <input type="number" step="any" name="x5" id="coef5" required><br>
+
+  <label for="x6">x6:</label>
+  <input type="number" step="any" name="x6" id="coef6" required><br>           
+
+
+
+  <button type="button" onclick="calculate()">Calcular</button>
+</form>
+
+<h2>Puntos de corte</h2>
+<p><span id="numRoots"></span> puntos</p>
+<table id="resultTable">
+  <!-- La tabla de resultados se completara con el codigo JavaScript. -->
+</table>
+
+<h2>Area entre puntos</h2>
+<p>Area: <span id="areaResult"></span></p>
+
+</body>
+</html>
+
